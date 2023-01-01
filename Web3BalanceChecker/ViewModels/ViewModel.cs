@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Win32;
 using Newtonsoft.Json;
@@ -85,15 +86,23 @@ namespace Web3BalanceChecker
                 var client = new HttpClient(handler);
 
                 var balanceList = new List<double>();
+                var awaitRequests = new List<Task<HttpResponseMessage>>();
                 
                 foreach (var request in ChainIdList.Select(chainId => new HttpRequestMessage(HttpMethod.Get, $"https://account.metafi.codefi.network/accounts/{address.ToLower()}?chainId={chainId}&includePrices=true")))
                 {
                     Debug.WriteLine("test");
                     request.Headers.Add("referer", "https://portfolio.metamask.io/");
 
-                    var response = client.SendAsync(request).Result;
-                    response.EnsureSuccessStatusCode();
-                    var responseBody = response.Content.ReadAsStringAsync().Result;
+                    var responseTask = client.SendAsync(request);
+                    awaitRequests.Add(responseTask);
+                }
+
+                var requestsResults = Task.WhenAll(awaitRequests).Result;
+                
+                foreach (var responseTask in requestsResults)
+                {
+                    responseTask.EnsureSuccessStatusCode();
+                    var responseBody = responseTask.Content.ReadAsStringAsync().Result;
                     var responseJson = JObject.Parse(responseBody);
                     double balance = 0;
                     try
