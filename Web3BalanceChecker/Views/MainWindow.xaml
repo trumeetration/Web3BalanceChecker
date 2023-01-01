@@ -1,0 +1,45 @@
+﻿<Window x:Class="Web3BalanceChecker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Web3BalanceChecker"
+        xmlns:viewModels="clr-namespace:Web3BalanceChecker"
+        d:DataContext="{d:DesignInstance viewModels:ViewModel}"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"></ColumnDefinition>
+            <ColumnDefinition Width="5*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <StackPanel VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock
+                    HorizontalAlignment="Center">Loaded addresses:</TextBlock>
+                <TextBlock
+                    Margin="5,0,0,0"
+                    Text="{Binding ReadAddresses.Count}"/>
+            </StackPanel>
+            <Button
+                Content="Load from file"
+                Margin="0,10"
+                Command="{Binding LoadDataFromFileCommand}"/>
+            <Button
+                Content="Scan"
+                Command="{Binding ScanAddresses}"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1">
+            <DataGrid
+                ItemsSource="{Binding AddressInfos}"
+                AutoGenerateColumns="True"
+                Height="370"/>
+            <ProgressBar 
+                Height="20"
+                Width="200"
+                Margin="0,10,0,0"
+                HorizontalAlignment="Right"
+                Value="{Binding ProgressState}"></ProgressBar>
+        </StackPanel>
+    </Grid>
+</Window>
